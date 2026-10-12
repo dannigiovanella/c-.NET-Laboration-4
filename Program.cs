@@ -166,7 +166,6 @@ Console.WriteLine();
 Console.WriteLine("Confusion matrix, 5-fold CV(on full dataset):");
 Console.WriteLine(finalMetrics.ConfusionMatrix.GetFormattedConfusionTable());
 
-//ÅLDER
 /* Create a new test passenger for prediction
 PassengerData newPassenger = new()
 {
@@ -177,6 +176,9 @@ PassengerData newPassenger = new()
     Fare = 6f
 };
 */
+
+//ÅLDER
+
 //Fråga om passagerarens ålder
 Console.WriteLine("Ange ålder för passagerare:");
 
@@ -207,15 +209,71 @@ if (age < 0)
     return;
 }
 
+//KÖN
+
+//Frågar användare om passagerares kön
+Console.WriteLine("Ange kön. male eller female:");
+
+//LÄser av användarens input och sparar den som en textsträng
+string inputSex = Console.ReadLine();
+
+//Kontrollerar ifall användaren inet angett nåt av de två alternativen
+//male eller female
+if (inputSex != "male" && inputSex != "female" )
+{
+    //Visar felmeddelande om input inte stämmer
+    Console.WriteLine("Oglitigt kön. Du måste ange male eller female");
+    //Avslutar programmet vid fel
+    return;
+}
+
+//KLASS
+
+//Frågar användaren efter passagerarens klass
+Console.WriteLine("Ange passagerarklass. 1, 2 eller 3:");
+
+//LÄser av användarens input och sparar den som en textsträng
+string inputClass = Console.ReadLine();
+
+
+//Kontrollerar om användarens input för klass går att omvandla till deciamltal
+//TryParse returnerar true om omvandling lyckas och false om den misslyckas
+//Boolean variabel används för validering
+//out gör att omvandling sparas i varibel passengerClass
+bool validClass = float.TryParse(inputClass, out float passengerClass);
+
+//KOntroll för om åldern inte kan omvandlas till ett tal
+if (!validClass)
+{
+    //Visar felmeddelande om input inte är giltigt
+    Console.WriteLine("Ogiltig klass. Ange 1, 2 eller 3");
+    //Avslutar programmet om input inte är giltig
+    return;
+}
+
+//KOntroll för om användarinput för klass inte är 1, 2 eller 3
+if (passengerClass != 1 && passengerClass != 2 && passengerClass != 3)
+{
+    //Visar felmeddelande vid fel input
+    Console.WriteLine("Ogiltig klass. Ange 1, 2 eller 3");
+    //Avslutar programmet vid fel
+    return;
+}
+
+
+
+
+
+
 //NYtt objket för ny passagerare
 //Skapar ett objekt av klassen PassengerData för ny passagerare
 PassengerData newPassenger = new()
 {
     //Ålder (klar)
     Age = age,
+    Sex = "inputSex",
+    Pclass = passengerClass,
     //Ej klara
-    Sex = "female",
-    Pclass = 2f,
     Parch = 0f,
     Fare = 6f
 
