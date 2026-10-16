@@ -107,6 +107,14 @@ var pipeline =
         inputColumnName: nameof(PassengerData.Parch),
         replacementMode: MissingValueReplacingEstimator.ReplacementMode.DefaultValue))
 
+    //Hanterar saknade värden i SibP. Antal syskon eller makar som passagerare har med sig
+    //DefaultValue ersätter det saknade värdet med 0
+    //Den nya kolumnen får namnet SibSpFilled
+    .Append(mlContext.Transforms.ReplaceMissingValues(
+        outputColumnName: "SibSpFilled",
+        inputColumnName: nameof(PassengerData.SibSp),
+        replacementMode: MissingValueReplacingEstimator.ReplacementMode.DefaultValue))
+
     //Hanterar saknade värden i Pclass
     //Ersätter saknat värde med medelvärde i biljettklass-kolumnen
     //Ny kolumn får namnet PclassFilled
@@ -130,6 +138,7 @@ var pipeline =
         "AgeFilled",
         "SexEncoded",
         "ParentChildFilled",
+        "SibSpFilled",
         "PclassFilled",
         "FareFilled"
     ))
@@ -413,6 +422,50 @@ while (!validParch)
     }
 }
 
+
+// SYSON OCH MAKAR
+
+//Variabel som håller koll på om inmatningen är giltig
+bool validSibSp = false;
+
+//Variabel som ska innehålla antalet syskon eller makar
+int sibSp = 0;
+
+//Loop som upprepar frågan tills användaren anger ett giltigt antal
+while (!validSibSp)
+{
+    //Frågar användaren im syskon eller makar
+    Console.WriteLine("Hur många syskon och makar reste tillsammans med passageraren? (Ange 0 om passageraren reste utan syskon eller make/maka)");
+
+    //LÄser av användarens input och sparar som textsträng
+    //?? "" används för att hantera nullvärde med en tom textsträng
+    string inputSibSp = Console.ReadLine() ?? "";
+
+    //Kontrollerar om användarens input för sibSp går att omvandla till deciamltal
+    //TryParse returnerar true om omvandling lyckas och false om den misslyckas
+    //int används för att vi vill få ut ett heltal
+    //out gör att omvandling sparas i varibel sibSp
+    validSibSp = int.TryParse(inputSibSp, out sibSp);
+
+    //KOntroll för om åldern inte kan omvandlas till ett tal
+    if (!validSibSp)
+    {
+        //
+        Console.WriteLine("Ogiltigt antal. Ange ett heltal, exempelvis 0, 1 eller 2.");
+    }
+    //Kontrollerar att antalet inte är ett negativt tal
+    else if (sibSp < 0)
+    {
+        //Visar felmeddelande om antalet är negativt
+        Console.WriteLine("Antalet måste vara 0 eller större.");
+
+        //Frågan upprepas så länge validParch är false
+        validSibSp = false;
+    }
+
+}
+
+
 //BILJETTPRIS
 
 //Variabel som håller koll på om biljettpriset är giltigt
@@ -469,6 +522,8 @@ PassengerData newPassenger = new()
     Pclass = passengerClass,
     //Antal föräldrar och barn
     Parch = parch,
+    //Antal syskon och makar
+    SibSp = sibSp,
     //Biljettpris
     Fare = fare
 
@@ -496,12 +551,14 @@ Console.WriteLine();
 Console.WriteLine("Ny passagerare:");
 //Skriver ut ålder från objektet newPassenger
 Console.WriteLine($"Ålder: {newPassenger.Age}");
-//Skriver ut kön...
+//Skriver ut kön
 Console.WriteLine($"Kön: {newPassenger.Sex}");
-//Skriver ut klass...
+//Skriver ut klass
 Console.WriteLine($"Klass: {newPassenger.Pclass}");
-//Skriver ut antal föräldrear o barn...
+//Skriver ut antal föräldrar o barn
 Console.WriteLine($"Antal föräldrar/barn: {newPassenger.Parch}");
+//Skriver ut antal syskon o makar
+Console.WriteLine($"Antal syskon/makar: {newPassenger.SibSp}");
 //Skriver ut biljettpris
 Console.WriteLine($"Biljettpris: {newPassenger.Fare}");
 
@@ -535,6 +592,7 @@ public class PassengerData
     [LoadColumn(2)] public float Pclass { get; set; }
     [LoadColumn(4)] public string Sex { get; set; } = ""; // "" ger en tom textsträng som startvärde
     [LoadColumn(5)] public float Age { get; set; }
+    [LoadColumn(6)] public float SibSp { get; set; }
     [LoadColumn(7)] public float Parch { get; set; }
     [LoadColumn(9)] public float Fare { get; set; }
 }
