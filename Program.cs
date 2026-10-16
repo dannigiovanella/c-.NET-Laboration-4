@@ -99,32 +99,32 @@ var pipeline =
         inputColumnName: nameof(PassengerData.Age),
         replacementMode: MissingValueReplacingEstimator.ReplacementMode.Mean))
 
-        //hanterar saknade värden i Parch. Antal föräldrar eller barn som passagerare har med sig
-        //DefaultValue ersätter det saknade värdet med 0 
-        //Ny kolumn får namnet ParentChildFilled
+    //hanterar saknade värden i Parch. Antal föräldrar eller barn som passagerare har med sig
+    //DefaultValue ersätter det saknade värdet med 0 
+    //Ny kolumn får namnet ParentChildFilled
     .Append(mlContext.Transforms.ReplaceMissingValues(
         outputColumnName: "ParentChildFilled",
         inputColumnName: nameof(PassengerData.Parch),
         replacementMode: MissingValueReplacingEstimator.ReplacementMode.DefaultValue))
 
-        //Hanterar saknade värden i Pclass
-        //Ersätter saknat värde med medelvärde i biljettklass-kolumnen
-        //Ny kolumn får namnet PclassFilled
+    //Hanterar saknade värden i Pclass
+    //Ersätter saknat värde med medelvärde i biljettklass-kolumnen
+    //Ny kolumn får namnet PclassFilled
     .Append(mlContext.Transforms.ReplaceMissingValues(
         outputColumnName: "PclassFilled",
         inputColumnName: nameof(PassengerData.Pclass),
         replacementMode: MissingValueReplacingEstimator.ReplacementMode.Mean))
 
-        //Hanterar saknat värde i Fare
-        //Ersätter saknat värde med medelvärde i biljettpris-kolumnen
-        //Ny kolumn får namnet FareFilled
+    //Hanterar saknat värde i Fare
+    //Ersätter saknat värde med medelvärde i biljettpris-kolumnen
+    //Ny kolumn får namnet FareFilled
     .Append(mlContext.Transforms.ReplaceMissingValues(
         outputColumnName: "FareFilled",
         inputColumnName: nameof(PassengerData.Fare),
         replacementMode: MissingValueReplacingEstimator.ReplacementMode.Mean))
 
-        //Samlar alla feauters i en gemensam kolumn som heter Features
-        //Information som modell lär sig samband och mönster för att överleva eller inte
+    //Samlar alla feauters i en gemensam kolumn som heter Features
+    //Information som modell lär sig samband och mönster för att överleva eller inte
     .Append(mlContext.Transforms.Concatenate(
         "Features",
         "AgeFilled",
@@ -249,156 +249,211 @@ Console.WriteLine(finalMetrics.ConfusionMatrix.GetFormattedConfusionTable());
 
 //ÅLDER
 
-//Fråga om passagerarens ålder
-Console.WriteLine("Ange ålder för passagerare:");
+//Variabel som har koll på om åldern är giltig
+bool validAge = false;
 
-//Läser av användarens input och sparar det som en textsträng
-//?? "" används för att hantera nullvärde med en tom textsträng
-string inputAge = Console.ReadLine() ?? "";
+//Variabel som ska innehålla passagerarens ålder
+float age = 0;
 
-//Kontrollerar om användarens input för ålder går att omvandla till deciamltal
-//TryParse returnerar true om omvandling lyckas och false om den misslyckas
-//Boolean variabel används för validering
-//out gör att omvandling sparas i varibel age
-bool validAge = float.TryParse(inputAge, out float age);
+//Loop som upprepar frågan om ålder så länge åldern inte är giltig
+while (!validAge)
 
-//KOntroll för om åldern inte kan omvandlas till ett tal
-if (!validAge)
 {
-    //Visar felmeddelande om input inte är giltigt
-    Console.WriteLine("Ogiltig ålder. Ange ett tal för ålder");
-    //Avslutar programmet om input inte är giltig
-    return;
-}
+    //Fråga om passagerarens ålder
+    Console.WriteLine("Ange ålder för passagerare:");
 
-//Kontroll för giltig ålder. Får inte va mindre än 0
-if (age < 0)
-{
-    //Visar felmeddelande om tal för åldern är negativ
-    Console.WriteLine("Åldern får inte vara ett negativt tal");
-    //Avslutar programmet vid fel input
-    return;
+    //Läser av användarens input och sparar det som en textsträng
+    //?? "" används för att hantera nullvärde med en tom textsträng
+    string inputAge = Console.ReadLine() ?? "";
+
+
+    //Kontrollerar om användarens input för ålder går att omvandla till deciamltal
+    //TryParse returnerar true om omvandling lyckas och false om den misslyckas
+    //out gör att omvandling sparas i varibel age
+    validAge = float.TryParse(inputAge, out age);
+
+    //KOntroll för om åldern inte kan omvandlas till ett tal
+    if (!validAge)
+    {
+        //Visar felmeddelande om input inte är giltigt
+        Console.WriteLine("Ogiltig ålder. Ange ett tal för ålder");
+    }
+
+    //Kontroll för giltig ålder. Får inte va mindre än 0
+    else if (age < 0)
+    {
+        //Visar felmeddelande om tal för åldern är negativ
+        Console.WriteLine("Åldern får inte vara ett negativt tal");
+
+        //Frågan ska upprepas så länge validAge är false
+        validAge = false;
+
+    }
 }
 
 //KÖN
 
-//Frågar användare om passagerares kön
-Console.WriteLine("Ange kön. male eller female:");
+//Variabel som håller koll på om könet är giltigt
+bool validSex = false;
 
-//LÄser av användarens input och sparar den som en textsträng
-//?? "" används för att hantera nullvärde med en tom textsträng
-string inputSex = Console.ReadLine() ?? "";
+//Variabel som ska innehålla passagerarens kön
+string inputSex = "";
 
-//Kontrollerar ifall användaren inet angett nåt av de två alternativen
-//male eller female
-if (inputSex != "male" && inputSex != "female")
+//Loop som upprepar frågan om kön så länge kön inte är giltig
+while (!validSex)
 {
-    //Visar felmeddelande om input inte stämmer
-    Console.WriteLine("Oglitigt kön. Du måste ange male eller female");
-    //Avslutar programmet vid fel
-    return;
+
+    //Frågar användare om passagerares kön
+    Console.WriteLine("Ange kön. male eller female:");
+
+    //LÄser av användarens input och sparar den som en textsträng
+    //?? "" används för att hantera nullvärde med en tom textsträng
+    inputSex = Console.ReadLine() ?? "";
+
+    //Kontrollerar ifall användaren inet angett nåt av de två alternativen
+    //male eller female
+    if (inputSex != "male" && inputSex != "female")
+    {
+        //Visar felmeddelande om input inte stämmer
+        Console.WriteLine("Oglitigt kön. Du måste ange male eller female");
+    }
+    else
+    {
+        //Är kön giltigt kan loop avslutas
+        validSex = true;
+    }
 }
 
 //KLASS
 
-//Frågar användaren efter passagerarens klass
-Console.WriteLine("Ange passagerarklass. 1, 2 eller 3:");
+//Variabel som håller koll på om klass är giltigt
+bool validClass = false;
 
-//LÄser av användarens input och sparar den som en textsträng
-string inputClass = Console.ReadLine() ?? "";
+//Variabel som ska innehålla passagerarens klass
+float passengerClass = 0;
 
-
-//Kontrollerar om användarens input för klass går att omvandla till deciamltal
-//TryParse returnerar true om omvandling lyckas och false om den misslyckas
-//Boolean variabel används för validering
-//out gör att omvandling sparas i varibel passengerClass
-bool validClass = float.TryParse(inputClass, out float passengerClass);
-
-//KOntroll för om åldern inte kan omvandlas till ett tal
-if (!validClass)
+//Loop som upprepar frågan om klass så länge klass inte är giltig
+while (!validClass)
 {
-    //Visar felmeddelande om input inte är giltigt
-    Console.WriteLine("Ogiltig klass. Ange 1, 2 eller 3");
-    //Avslutar programmet om input inte är giltig
-    return;
-}
 
-//KOntroll för om användarinput för klass inte är 1, 2 eller 3
-if (passengerClass != 1 && passengerClass != 2 && passengerClass != 3)
-{
-    //Visar felmeddelande vid fel input
-    Console.WriteLine("Ogiltig klass. Ange 1, 2 eller 3");
-    //Avslutar programmet vid fel
-    return;
+    //Frågar användaren efter passagerarens klass
+    Console.WriteLine("Ange passagerarklass. 1, 2 eller 3:");
+
+    //LÄser av användarens input och sparar den som en textsträng
+    string inputClass = Console.ReadLine() ?? "";
+
+
+    //Kontrollerar om användarens input för klass går att omvandla till deciamltal
+    //TryParse returnerar true om omvandling lyckas och false om den misslyckas
+    //out gör att omvandling sparas i varibel passengerClass
+    validClass = float.TryParse(inputClass, out passengerClass);
+
+    //KOntroll för om åldern inte kan omvandlas till ett tal
+    if (!validClass)
+    {
+        //Visar felmeddelande om input inte är giltigt
+        Console.WriteLine("Ogiltig klass. Ange 1, 2 eller 3");
+
+    }
+
+    //KOntroll för om användarinput för klass inte är 1, 2 eller 3
+    else if (passengerClass != 1 && passengerClass != 2 && passengerClass != 3)
+    {
+        //Visar felmeddelande vid fel input
+        Console.WriteLine("Ogiltig klass. Ange 1, 2 eller 3");
+
+        //Upprepar frågan så länge validclass är false
+        validClass = false;
+
+    }
 }
 
 //FÖRÄLDRAR OCH BARN
 
 //Parch = HUr många barn och föärldra som reste tillsammans
 
-//Fråga användaren hur många barn eller förädrar som reste med passagerare
-Console.WriteLine("Hur många föräldrar och barn reste tillsammans med passageraren? (Ange 0 om passageraren reste utan föräldrar eller barn)");
+//Variabel som håller koll på om antalet är giltigt
+bool validParch = false;
 
-//LÄser av användarens input och sparar som textsträng
-//?? "" används för att hantera nullvärde med en tom textsträng
-string inputParch = Console.ReadLine() ?? "";
+//Variabel som ska innehålla antalet föräldrar och barn
+int parch = 0;
 
-//Kontrollerar om användarens input för parch går att omvandla till deciamltal
-//TryParse returnerar true om omvandling lyckas och false om den misslyckas
-//Boolean variabel används för validering
-//int används för att vi vill få ut ett heltal
-//out gör att omvandling sparas i varibel parch
-bool validParch = int.TryParse(inputParch, out int parch);
-
-//KOntroll för om åldern inte kan omvandlas till ett tal
-if (!validParch)
+//Loop som upprepar frågan så länge antalet inte är giltigt
+while (!validParch)
 {
-    //Visar felmeddelande om input inte är giltigt
-    Console.WriteLine("Ogiltig antal. Ange ett heltal som ex: 0, 1 eller 2");
-    //Avslutar programmet om input inte är giltig
-    return;
-}
 
-//KOntroll för om antalet är ett nagativt tal
-if (parch < 0)
-{
-    //Visar felmeddelande om antalet är negativt
-    Console.WriteLine("Antalet måste vara 0 eller större");
-    //Avslutar programmet om input inte är giltig
-    return;
+    //Fråga användaren hur många barn eller förädrar som reste med passagerare
+    Console.WriteLine("Hur många föräldrar och barn reste tillsammans med passageraren? (Ange 0 om passageraren reste utan föräldrar eller barn)");
+
+    //LÄser av användarens input och sparar som textsträng
+    //?? "" används för att hantera nullvärde med en tom textsträng
+    string inputParch = Console.ReadLine() ?? "";
+
+    //Kontrollerar om användarens input för parch går att omvandla till deciamltal
+    //TryParse returnerar true om omvandling lyckas och false om den misslyckas
+    //int används för att vi vill få ut ett heltal
+    //out gör att omvandling sparas i varibel parch
+    validParch = int.TryParse(inputParch, out parch);
+
+    //KOntroll för om åldern inte kan omvandlas till ett tal
+    if (!validParch)
+    {
+        //Visar felmeddelande om input inte är giltigt
+        Console.WriteLine("Ogiltig antal. Ange ett heltal som ex: 0, 1 eller 2");
+    }
+
+    //KOntroll för om antalet är ett nagativt tal
+    else if (parch < 0)
+    {
+        //Visar felmeddelande om antalet är negativt
+        Console.WriteLine("Antalet måste vara 0 eller större");
+
+        //Frågan upprepas så länge validParch är false
+        validParch = false;
+    }
 }
 
 //BILJETTPRIS
 
-//Fråga om biljettpris
-Console.WriteLine("Ange biljettpris:");
+//Variabel som håller koll på om biljettpriset är giltigt
+bool validFare = false;
 
-//Läser av användarens input och sparar det som en textsträng
-//?? "" används för att hantera nullvärde med en tom textsträng
-string inputFare = Console.ReadLine() ?? "";
+//Variabel som ska innehålla biljettpriset
+float fare = 0;
 
-//Kontrollerar om användarens input för biljettpris går att omvandla till deciamltal
-//TryParse returnerar true om omvandling lyckas och false om den misslyckas
-//Boolean variabel används för validering
-//out gör att omvandling sparas i varibel fare
-bool validFare = float.TryParse(inputFare, out float fare);
-
-//KOntroll för om biljettpris inte kan omvandlas till ett tal
-if (!validFare)
+//Loop som upprepar frågan så länge biljettpriset inte är giltigt
+while (!validFare)
 {
-    //Visar felmeddelande om input inte är giltigt
-    Console.WriteLine("Ogiltigt biljettpris. Ange ett tal:");
-    //Avslutar programmet om input inte är giltig
-    return;
-}
 
-//Kontroll för giltigt pris. Får inte va mindre än 0
-if (fare < 0)
-{
-    //Visar felmeddelande om tal för biljettpris är negativ
-    Console.WriteLine("Biljettpris får inte vara ett negativt tal");
-    //Avslutar programmet vid fel input
-    return;
+    //Fråga om biljettpris
+    Console.WriteLine("Ange biljettpris:");
+
+    //Läser av användarens input och sparar det som en textsträng
+    //?? "" används för att hantera nullvärde med en tom textsträng
+    string inputFare = Console.ReadLine() ?? "";
+
+    //Kontrollerar om användarens input för biljettpris går att omvandla till deciamltal
+    //TryParse returnerar true om omvandling lyckas och false om den misslyckas
+    //Boolean variabel används för validering
+    //out gör att omvandling sparas i varibel fare
+    validFare = float.TryParse(inputFare, out fare);
+
+    //KOntroll för om biljettpris inte kan omvandlas till ett tal
+    if (!validFare)
+    {
+        //Visar felmeddelande om input inte är giltigt
+        Console.WriteLine("Ogiltigt biljettpris. Ange ett tal:");
+    }
+
+    //Kontroll för giltigt pris. Får inte va mindre än 0
+    else if (fare < 0)
+    {
+        //Visar felmeddelande om tal för biljettpris är negativ
+        Console.WriteLine("Biljettpris får inte vara ett negativt tal");
+        //Upprepar frågan så länge validFare är false
+        validFare = false;
+
+    }
 }
 
 
