@@ -1,8 +1,14 @@
 ﻿
-//
-//Orginalkod av Mikael Hasselmalm
-//Modifierad kod av Daniela Giovanella
+/*
+Laboration 4: Moment 4 - C# för ML
 
+Skapa ett program där man med machine learning kan förtutsäga om en passagerare
+överlever Titanic baserad på datasetet Titanic-Dataset.
+
+
+Orginalkod av: Mikael Hasselmalm
+Modifierad kod av: Daniela Giovanella
+*/
 
 
 
@@ -80,7 +86,7 @@ foreach (var row in preview.RowView)
 Console.WriteLine();
 
 //PIPELINE
-//Skapar pipeline  från csv- fil som innehåller stegen för attförbetedea dataset och träna ML-modellen:
+//Skapar pipeline  från csv- fil som innehåller stegen för att förbetedea dataset och träna ML-modellen:
 //Sparas i varibeln pipeline
 //Gör om text till numeriska värden, hanterar saknade värden och samlar features i en kolumn
 //  
@@ -143,7 +149,7 @@ var pipeline =
         "FareFilled"
     ))
 
-    //Normaliserar värdena i Features till ett jämförbart numeriskt intervall som hjälper modellen hantera features med olika skalor
+    //Normaliserar värdena i Features som hjälper modellen hantera features med olika skalor
     .Append(mlContext.Transforms.NormalizeMinMax("Features"))
 
     //Lägger till algoritm som ska träna midellen
